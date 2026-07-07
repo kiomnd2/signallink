@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 
 /** 포트 스텁만으로 수집 유스케이스 로직 검증 (외부 API/DB 없음). */
 class DisclosureCollectServiceTest {
@@ -47,6 +48,32 @@ class DisclosureCollectServiceTest {
 
         assertThat(saved).isZero();
         assertThat(repo.stored).isEmpty();
+    }
+
+    @Test
+    void 한_건_저장이_실패해도_나머지는_저장된다() {
+        List<DisclosureCandidate> given = List.of(
+            candidate("20240102000001", "005930", "공급계약체결"),  // 정상 저장
+            candidate("20240102000002", "000660", "유상증자결정"),  // 저장 시 예외 → 건너뜀
+            candidate("20240102000003", "035420", "소송 제기")       // 정상 저장
+        );
+        DartGatewayPort gateway = (from, to) -> given;
+        // 2번째 rcept_no 저장 시 UNIQUE 제약 위반을 시뮬레이션 (오버랩 폴링 레이스 등)
+        InMemoryRepo repo = new InMemoryRepo() {
+            @Override
+            public Disclosure save(Disclosure disclosure) {
+                if ("20240102000002".equals(disclosure.getReceiptNo())) {
+                    throw new DataIntegrityViolationException("duplicate rcept_no");
+                }
+                return super.save(disclosure);
+            }
+        };
+
+        int saved = new DisclosureCollectService(gateway, repo).collectRecent(1);
+
+        assertThat(saved).isEqualTo(2);
+        assertThat(repo.stored).extracting(Disclosure::getReceiptNo)
+            .containsExactly("20240102000001", "20240102000003");
     }
 
     private DisclosureCandidate candidate(String receiptNo, String stockCode, String title) {

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,13 +47,21 @@ public class DisclosureCollectService {
             if (c.stockCode() == null || c.stockCode().isBlank()) {
                 continue; // 비상장/시장 외 공시 → 스킵
             }
-            if (repository.existsByReceiptNo(c.receiptNo())) {
-                continue; // 이미 수집한 공시 → 스킵
+            try {
+                if (repository.existsByReceiptNo(c.receiptNo())) {
+                    continue; // 이미 수집한 공시 → 스킵
+                }
+                String category = classifier.classify(c.title());
+                repository.save(new Disclosure(
+                    c.stockCode().trim(), c.receiptNo(), c.title(), category, c.disclosedAt(), c.dartUrl()));
+                saved++;
+            } catch (DataIntegrityViolationException e) {
+                // 오버랩 폴링 레이스 등으로 이미 저장됨(UNIQUE 위반) → 멱등 처리, 무시하고 계속
+                log.debug("공시 저장 건너뜀 (제약 위반/중복): rcept_no={}", c.receiptNo());
+            } catch (RuntimeException e) {
+                // 한 건의 실패가 배치 전체를 죽이지 않도록 격리
+                log.warn("공시 저장 실패, 건너뜀: rcept_no={} ({})", c.receiptNo(), e.toString());
             }
-            String category = classifier.classify(c.title());
-            repository.save(new Disclosure(
-                c.stockCode().trim(), c.receiptNo(), c.title(), category, c.disclosedAt(), c.dartUrl()));
-            saved++;
         }
         log.info("공시 수집: 후보 {}건 중 신규 {}건 저장", candidates.size(), saved);
         return saved;

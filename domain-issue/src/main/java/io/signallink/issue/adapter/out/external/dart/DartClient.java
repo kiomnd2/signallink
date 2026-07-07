@@ -7,8 +7,6 @@ import io.signallink.issue.application.port.out.DisclosureCandidate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class DartClient extends ExternalApiClient implements DartGatewayPort {
 
-    private static final Logger log = LoggerFactory.getLogger(DartClient.class);
     private static final DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private final String apiKey;
@@ -46,13 +43,26 @@ public class DartClient extends ExternalApiClient implements DartGatewayPort {
                 .build())
             .retrieve()
             .body(DartListResponse.class));
+        return interpret(res);
+    }
 
-        if (res == null || DartListResponse.NO_DATA.equals(res.status())) {
-            return List.of(); // 조회 기간 내 공시 없음
+    /**
+     * 응답 상태를 해석해 후보 목록으로 변환한다.
+     *
+     * <p>status {@code "013"}(데이터 없음)만 빈 목록으로 정상 처리한다. 그 외 비정상 상태(인증 실패·
+     * 한도 초과·점검 등, DART는 HTTP 200 + 바디로 알림)는 <b>예외를 던져</b> 상위 스케줄러가 실패로
+     * 인지·알림하게 한다 — "오늘 공시 0건"과 혼동해 조용히 수집이 멈추는 것을 막는다.
+     */
+    static List<DisclosureCandidate> interpret(DartListResponse res) {
+        if (res == null) {
+            throw new IllegalStateException("DART 응답 없음(null)");
+        }
+        if (DartListResponse.NO_DATA.equals(res.status())) {
+            return List.of();
         }
         if (!DartListResponse.OK.equals(res.status())) {
-            log.warn("DART 응답 비정상: status={} message={}", res.status(), res.message());
-            return List.of();
+            throw new IllegalStateException(
+                "DART 오류 상태: status=" + res.status() + " message=" + res.message());
         }
         return res.toCandidates();
     }
