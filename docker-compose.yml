@@ -1,0 +1,49 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: signallink
+      POSTGRES_USER: signallink
+      POSTGRES_PASSWORD: signallink
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U signallink"]
+      interval: 5s
+      retries: 10
+
+  app-api:
+    build:
+      context: .
+      dockerfile: app-api/Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/signallink
+      DB_USER: signallink
+      DB_PASSWORD: signallink
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app-collector:
+    build:
+      context: .
+      dockerfile: app-collector/Dockerfile
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/signallink
+      DB_USER: signallink
+      DB_PASSWORD: signallink
+      LLM_DAILY_LIMIT: "60"
+    ports:
+      - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+      app-api:
+        condition: service_started   # Flyway 마이그레이션은 app-api가 소유
+
+volumes:
+  pgdata:

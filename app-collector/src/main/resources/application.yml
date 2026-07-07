@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: signal-collector
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/signallink}
+    username: ${DB_USER:signallink}
+    password: ${DB_PASSWORD:signallink}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+signallink:
+  llm:
+    daily-limit: ${LLM_DAILY_LIMIT:60}

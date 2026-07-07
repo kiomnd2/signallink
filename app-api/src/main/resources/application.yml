@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: signal-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/signallink}
+    username: ${DB_USER:signallink}
+    password: ${DB_PASSWORD:signallink}
+  jpa:
+    hibernate:
+      ddl-auto: none   # 스키마는 Flyway가 소유한다
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
