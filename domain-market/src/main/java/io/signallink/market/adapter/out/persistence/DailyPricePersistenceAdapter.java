@@ -4,8 +4,10 @@ import io.signallink.market.application.port.out.DailyPriceQueryPort;
 import io.signallink.market.application.port.out.DailyPriceRepositoryPort;
 import io.signallink.market.application.port.out.DailyPriceSnapshotQueryPort;
 import io.signallink.market.application.port.out.DatedClose;
+import io.signallink.market.application.port.out.SectorMoveQueryPort;
 import io.signallink.market.application.port.out.StockDaySnapshot;
 import io.signallink.market.domain.DailyPrice;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +19,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DailyPricePersistenceAdapter
-    implements DailyPriceRepositoryPort, DailyPriceQueryPort, DailyPriceSnapshotQueryPort {
+    implements DailyPriceRepositoryPort, DailyPriceQueryPort, DailyPriceSnapshotQueryPort,
+        SectorMoveQueryPort {
 
     private final DailyPriceJpaRepository jpa;
 
@@ -54,5 +57,10 @@ public class DailyPricePersistenceAdapter
             .map(p -> new StockDaySnapshot(
                 p.getStockCode(), p.getChangeRate(), p.getVolRatio20d(), p.getTradingValue()))
             .toList();
+    }
+
+    @Override
+    public List<BigDecimal> sectorChangeRates(String sectorCode, LocalDate tradeDate, String excludeStockCode) {
+        return jpa.findSectorChangeRates(sectorCode, tradeDate, excludeStockCode);
     }
 }

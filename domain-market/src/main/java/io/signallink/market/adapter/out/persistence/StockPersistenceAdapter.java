@@ -1,5 +1,7 @@
 package io.signallink.market.adapter.out.persistence;
 
+import io.signallink.market.application.port.out.StockInfo;
+import io.signallink.market.application.port.out.StockInfoQueryPort;
 import io.signallink.market.application.port.out.StockRepositoryPort;
 import io.signallink.market.domain.Stock;
 import java.util.Collection;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Component;
 /** 아웃바운드 어댑터 — StockRepositoryPort를 Spring Data JPA로 구현. */
 @Component
 @RequiredArgsConstructor
-public class StockPersistenceAdapter implements StockRepositoryPort {
+public class StockPersistenceAdapter implements StockRepositoryPort, StockInfoQueryPort {
 
     private final StockJpaRepository jpa;
 
@@ -32,5 +34,12 @@ public class StockPersistenceAdapter implements StockRepositoryPort {
     @Override
     public List<Stock> findAll() {
         return jpa.findAll();
+    }
+
+    @Override
+    public StockInfo find(String stockCode) {
+        return jpa.findById(stockCode)
+            .map(s -> new StockInfo(s.getMarketType(), s.getSectorCode()))
+            .orElse(null);
     }
 }
