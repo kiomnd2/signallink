@@ -1,0 +1,28 @@
+{
+  "rt_cd": "0",
+  "msg1": "정상처리 되었습니다.",
+  "output2": [
+    {
+      "stck_bsop_date": "20260708",
+      "stck_clpr": "278000",
+      "stck_oprc": "285500",
+      "stck_hgpr": "300000",
+      "stck_lwpr": "278000",
+      "acml_vol": "21442122",
+      "acml_tr_pbmn": "6203329208250",
+      "prdy_vrss": "-18000",
+      "prdy_vrss_sign": "5"
+    },
+    {
+      "stck_bsop_date": "20260707",
+      "stck_clpr": "296000",
+      "stck_oprc": "290000",
+      "stck_hgpr": "298000",
+      "stck_lwpr": "289000",
+      "acml_vol": "15000000",
+      "acml_tr_pbmn": "4400000000000",
+      "prdy_vrss": "5000",
+      "prdy_vrss_sign": "2"
+    }
+  ]
+}

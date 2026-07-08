@@ -1,0 +1,26 @@
+{
+  "rt_cd": "0",
+  "msg1": "정상처리 되었습니다.",
+  "output2": [
+    {
+      "stck_bsop_date": "20260708",
+      "bstp_nmix_prpr": "7297.25",
+      "bstp_nmix_oprc": "7452.48",
+      "bstp_nmix_hgpr": "7791.66",
+      "bstp_nmix_lwpr": "7291.26",
+      "acml_vol": "345927",
+      "acml_tr_pbmn": "27219164",
+      "mod_yn": "N"
+    },
+    {
+      "stck_bsop_date": "20260707",
+      "bstp_nmix_prpr": "7452.48",
+      "bstp_nmix_oprc": "7400.00",
+      "bstp_nmix_hgpr": "7500.00",
+      "bstp_nmix_lwpr": "7390.00",
+      "acml_vol": "300000",
+      "acml_tr_pbmn": "25000000",
+      "mod_yn": "N"
+    }
+  ]
+}
