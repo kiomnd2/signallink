@@ -152,12 +152,14 @@ DART는 워치리스트 무관(시장 전체 폴링 후 stock_code 필터)이라
 
 ## 9. 구현 순서 (체크리스트)
 
-1. [ ] `domain-issue/build.gradle.kts`에 spring-web + starter-json 추가, 빌드 확인
-2. [ ] `domain/`: 엔티티 `Disclosure`·`News` (@Entity 겸 도메인) + `application/port/out`: `*RepositoryPort` 인터페이스
-3. [ ] `adapter/out/persistence`: Spring Data `*JpaRepository`(+exists) + `*PersistenceAdapter`(impl 포트) → `@DataJpaTest`로 저장/중복 제약 테스트
-4. [ ] `domain/`: `DisclosureCategoryClassifier` + 룰 단위 테스트
-5. [ ] `application/port/out`: `DartGatewayPort` + `adapter/out/external`: `DartClient`·`DartListResponse` + 픽스처 파서 테스트
-6. [ ] `application/service`: `DisclosureCollectService` (포트 주입: DartGateway→필터→RepositoryPort 저장) + 스텁 포트로 서비스 단위 테스트
+> **진행 현황 (2026-07-08)**: 공시(DART) 세로 슬라이스 **완료 — PR #3 머지**. 코드 리뷰 High 3건(파싱 건별 skip·수집 예외 격리·상태코드 예외화) 반영, 단위 테스트 16건. 남음: 뉴스(7~8) · 설정/스케줄러(9~10) · 실호출 dry-run(11).
+
+1. [x] `domain-issue/build.gradle.kts`에 spring-web + starter-json 추가, 빌드 확인
+2. [x] `domain/`: 엔티티 `Disclosure` (@Entity 겸 도메인) + `application/port/out`: `DisclosureRepositoryPort` *(News 엔티티는 뉴스 슬라이스에서)*
+3. [x] `adapter/out/persistence`: `DisclosureJpaRepository`(+exists) + `DisclosurePersistenceAdapter`(impl 포트) → `@DataJpaTest`(Testcontainers) 저장/중복 제약 테스트
+4. [x] `domain/`: `DisclosureCategoryClassifier` + 룰 단위 테스트
+5. [x] `application/port/out`: `DartGatewayPort` + `adapter/out/external`: `DartClient`·`DartListResponse` + 픽스처 파서 테스트 (+ 상태코드 해석 `interpret()`)
+6. [x] `application/service`: `DisclosureCollectService` (포트 주입: DartGateway→필터→RepositoryPort 저장) + 스텁 포트 서비스 단위 테스트 (+ 건별 예외 격리)
 7. [ ] `application/port/out`: `NaverNewsGatewayPort`·`WatchlistPort` + `adapter/out/external`: `NaverNewsClient`·`NaverNewsResponse`(태그 제거) + 픽스처 파서 테스트
 8. [ ] `adapter/out/persistence`: `SeedWatchlistAdapter`(시드 CSV, §8) + `application/service`: `NewsCollectService`(WatchlistPort 주입 구동)
 9. [ ] `IssueApiProperties` + application.yml `signallink.issue.*` 바인딩
