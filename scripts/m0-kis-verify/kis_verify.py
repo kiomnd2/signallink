@@ -138,8 +138,8 @@ def main():
     print("\n== 2. 순위 TR (실전 전용) ==")
     call_tr(token, "FHPST01700000", "/uapi/domestic-stock/v1/ranking/fluctuation", {
         "fid_cond_mrkt_div_code": "J", "fid_cond_scr_div_code": "20170",
-        "fid_input_iscd": "0000", "fid_rank_sort_cls_code": "0000",
-        "fid_input_cnt_1": "10", "fid_prc_cls_code": "0",
+        "fid_input_iscd": "0000", "fid_rank_sort_cls_code": "0",  # 0:상승률순 (1자 — "0000"은 SIZE 오류)
+        "fid_input_cnt_1": "0", "fid_prc_cls_code": "0",  # 0:당일 누적
         "fid_input_price_1": "", "fid_input_price_2": "",
         "fid_vol_cnt": "", "fid_trgt_cls_code": "0",
         "fid_trgt_exls_cls_code": "0", "fid_div_cls_code": "0",

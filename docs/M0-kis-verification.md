@@ -69,3 +69,30 @@ ssh user@vps 'export KIS_APPKEY=... KIS_APPSECRET=...; python3 kis_verify.py'
 ## 3. Exit 판정
 
 전부 통과 → M1 잔여 작업 진행. 한도 부족 → 배치 주기·종목 수 조정 후 확정서 반영하고 진행. VPS 차단 → VPS 교체 후 Day 4~5 재실행.
+
+---
+
+## 4. 실행 결과 (2026-07-08, 로컬 · 실전 키)
+
+### TR 4종 — 전부 `rt_cd=0` (등락률 순위 파라미터 수정 후)
+| TR | 결과 | 응답 주요 필드 (상세스펙 5장 기입용) |
+|----|------|--------------------------------------|
+| 등락률 순위 `FHPST01700000` | ✅ 30행 | `stck_shrn_iscd, data_rank, hts_kor_isnm, stck_prpr, prdy_vrss, prdy_vrss_sign, prdy_ctrt, acml_vol, stck_hgpr, stck_lwpr` |
+| 거래량순위(거래대금) `FHPST01710000` | ✅ 30행 | `hts_kor_isnm, mksc_shrn_iscd, data_rank, stck_prpr, prdy_vrss, prdy_ctrt, acml_vol, prdy_vol, lstn_stcn, avrg_vol` |
+| 종목별 투자자 `FHKST01010900` | ✅ 30행 | `stck_bsop_date, stck_clpr, prsn_ntby_qty, frgn_ntby_qty, orgn_ntby_qty, prsn_ntby_tr_pbmn, frgn_ntby_tr_pbmn, orgn_ntby_tr_pbmn` |
+| 외인·기관 가집계 `FHPTJ04400000` | ✅ rt_cd=0, 0행 | 09:22 실행 — 첫 갱신(외인 09:30) 전이라 빈 응답(정상). **장중 09:30~14:30 재실행 시 데이터 확인 필요** |
+
+### 한도 실측 (`--probe`)
+- **초당 2건 동시 → 즉시 EGW00201(유량 초과) → 실측 한도 초당 ~1건** (기존 20건 → 신규 고객 대폭 하향, 포털 공지대로)
+- J2 예산: 배치당 82콜 → 초당 1건 기준 **~82초/배치** → 30분 창(1,800초)에 여유
+
+### 결정 (확정서 반영 대상)
+- ✅ **40종목·30분 유지** — 82초 ≪ 30분이라 타이밍 여유 충분
+- ✅ `common.RateLimiter` **permitsPerSecond = 1.0 (안전하게 0.8)** 로 설정 (M2에서 KIS 클라이언트 생성 시)
+- ⚠️ **일별 총량 제한**은 이 probe로 미확인 → 운영 중 모니터 (BACKLOG)
+
+### 환경 이슈 (재현 방지 메모)
+- 이 머신 Python(3.14, python.org)이 **CA 번들 미보유** → 실행 시 `SSL_CERT_FILE=/etc/ssl/cert.pem` 지정 필요. (네트워크·인증서 자체는 정상 — MITM 아님)
+- `kis_verify.py`: 등락률 순위 `FID_RANK_SORT_CLS_CODE`는 **1자리**(`"0"` 상승률순). `"0000"`은 `INVALID INPUT_FILED_SIZE` 오류 → 수정 완료.
+
+**Exit: 통과.** TR 4종 성공 + 한도 확정(초당 1건, 40종목·30분 유지).
