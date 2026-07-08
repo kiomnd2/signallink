@@ -1,6 +1,9 @@
 .gradle/
 build/
 out/
+# 단, 헥사고날 소스 패키지(application/port/out, adapter/out)는 추적 대상 — IntelliJ 출력 out/과 구분
+!**/src/**/out/
+!**/src/**/out/**
 .idea/
 *.iml
 .env
