@@ -57,10 +57,10 @@ public class DartClient extends ExternalApiClient implements DartGatewayPort {
         if (res == null) {
             throw new IllegalStateException("DART 응답 없음(null)");
         }
-        if (DartListResponse.NO_DATA.equals(res.status())) {
+        if (DartStatus.NO_DATA.equals(res.status())) {
             return List.of();
         }
-        if (!DartListResponse.OK.equals(res.status())) {
+        if (!DartStatus.OK.equals(res.status())) {
             throw new IllegalStateException(
                 "DART 오류 상태: status=" + res.status() + " message=" + res.message());
         }

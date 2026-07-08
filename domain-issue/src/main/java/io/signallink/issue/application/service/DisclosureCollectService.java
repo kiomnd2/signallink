@@ -8,6 +8,7 @@ import io.signallink.issue.domain.Disclosure;
 import io.signallink.issue.domain.DisclosureCategoryClassifier;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
  * 아웃바운드 포트에만 의존하므로 외부 API/DB 없이 스텁으로 단위 테스트할 수 있다.
  */
 @Service
+@RequiredArgsConstructor
 public class DisclosureCollectService {
 
     private static final Logger log = LoggerFactory.getLogger(DisclosureCollectService.class);
@@ -27,11 +29,6 @@ public class DisclosureCollectService {
     private final DartGatewayPort dartGateway;
     private final DisclosureRepositoryPort repository;
     private final DisclosureCategoryClassifier classifier = new DisclosureCategoryClassifier();
-
-    public DisclosureCollectService(DartGatewayPort dartGateway, DisclosureRepositoryPort repository) {
-        this.dartGateway = dartGateway;
-        this.repository = repository;
-    }
 
     /**
      * 최근 {@code daysBack}일치 공시를 수집한다. 재실행해도 rcept_no 기준으로 중복 저장하지 않는다(멱등).

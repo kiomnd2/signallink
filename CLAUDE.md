@@ -63,6 +63,7 @@ io.signallink.<domain>
 - **커밋 메시지**: gitmoji + 한국어 제목 (예: `✨ ...`, `🐛 ...`). **`Co-Authored-By` 절대 포함하지 않는다**(프로젝트 규칙).
 - **CI**(`.github/workflows/ci.yml`): push(main)/PR에서 `gradle build` 실행. `deploy.yml`은 VPS 계약 전까지 비활성.
 - **문서 동기화**: 작업을 완료한 뒤 관련 참조 문서(도메인 플랜·`ARCHITECTURE.md`·`BACKLOG.md`·`CLAUDE.md`)를 생성/갱신해 코드와 맞춘다. 문서를 미리 만들어두지 말고, 실제 구현·검증 결과에 맞춰 사후 반영한다.
+- **코딩 컨벤션**: 생성자 주입은 Lombok `@RequiredArgsConstructor` + `private final` 필드, getter는 `@Getter`(엔티티·모델)로 — 수동 작성 금지. 단 `@Value`·`super()`가 섞인 특수 생성자(예: `DartClient`·`KisTokenProvider`)는 수동 유지. 외부 API status 코드 등 매직값은 전용 상수 클래스로 분리(예: `DartStatus`).
 
 ## 함정 (겪은 것)
 

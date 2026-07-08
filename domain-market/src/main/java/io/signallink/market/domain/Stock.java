@@ -1,13 +1,18 @@
-package io.signallink.market;
+package io.signallink.market.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import lombok.Getter;
 
-/** 엔티티 작성 패턴 예시 — 다른 테이블도 이 형태를 따른다 (스키마 지정 필수). */
+/**
+ * 종목 마스터 도메인 모델 (헥사고날 Level 1 — JPA 엔티티 겸용, docs/ARCHITECTURE.md §4).
+ * market.stock 매핑. stock_code(6자리 종목코드)가 자연 키.
+ */
 @Entity
+@Getter
 @Table(name = "stock", schema = "market")
 public class Stock {
 
@@ -27,7 +32,7 @@ public class Stock {
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
-    protected Stock() {}
+    protected Stock() {} // JPA 전용
 
     public Stock(String stockCode, String name, String marketType, String sectorCode, OffsetDateTime updatedAt) {
         this.stockCode = stockCode;
@@ -36,10 +41,4 @@ public class Stock {
         this.sectorCode = sectorCode;
         this.updatedAt = updatedAt;
     }
-
-    public String getStockCode() { return stockCode; }
-    public String getName() { return name; }
-    public String getMarketType() { return marketType; }
-    public String getSectorCode() { return sectorCode; }
-    public OffsetDateTime getUpdatedAt() { return updatedAt; }
 }

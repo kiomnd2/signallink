@@ -20,7 +20,7 @@ class DartListResponseTest {
             res = mapper.readValue(in, DartListResponse.class);
         }
 
-        assertThat(res.status()).isEqualTo(DartListResponse.OK);
+        assertThat(res.status()).isEqualTo(DartStatus.OK);
 
         List<DisclosureCandidate> candidates = res.toCandidates();
         assertThat(candidates).hasSize(2);
