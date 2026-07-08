@@ -41,6 +41,25 @@ class PriceCollectServiceTest {
         assertThat(dailyRepo.saved).extracting(DailyPrice::getTradeDate).containsExactly(D1);
     }
 
+    @Test
+    void vol_ratio를_계산해_채운다() {
+        List<DailyPriceData> series = new ArrayList<>();
+        LocalDate d = D0.minusDays(20);
+        for (int i = 0; i < 20; i++) { // 직전 20영업일 거래량 100
+            series.add(new DailyPriceData(d, new BigDecimal("1000"), BigDecimal.ZERO, 100L, 100L));
+            d = d.plusDays(1);
+        }
+        series.add(new DailyPriceData(D0, new BigDecimal("1000"), BigDecimal.ZERO, 300L, 300L)); // 당일 3배
+        DailyPriceGatewayPort dailyGw = (code, from, to) -> series;
+
+        DailyRepo dailyRepo = new DailyRepo();
+        PriceCollectService service = new PriceCollectService(dailyGw, (c, f, t) -> List.of(), dailyRepo, new IndexRepo());
+        int saved = service.collectDailyWithVolRatio("005930", D0, D0);
+
+        assertThat(saved).isEqualTo(1);
+        assertThat(dailyRepo.saved.get(0).getVolRatio20d()).isEqualByComparingTo("3.00");
+    }
+
     static class DailyRepo implements DailyPriceRepositoryPort {
         final List<DailyPrice> saved = new ArrayList<>();
         final Set<String> existing = new HashSet<>();

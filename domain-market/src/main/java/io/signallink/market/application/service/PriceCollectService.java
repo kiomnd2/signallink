@@ -8,7 +8,11 @@ import io.signallink.market.application.port.out.IndexPriceGatewayPort;
 import io.signallink.market.application.port.out.IndexPriceRepositoryPort;
 import io.signallink.market.domain.DailyPrice;
 import io.signallink.market.domain.IndexPrice;
+import io.signallink.market.domain.VolumeRatioCalculator;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -58,5 +62,37 @@ public class PriceCollectService {
     private static DailyPrice toEntity(String stockCode, DailyPriceData d) {
         return new DailyPrice(stockCode, d.tradeDate(), d.close(), d.changeRate(),
             d.volume(), d.tradingValue(), null, true);
+    }
+
+    private static final int VOL_RATIO_BUFFER_DAYS = 40; // 20영업일 prior 확보용(달력일 버퍼)
+
+    /**
+     * [from,to] 일봉을 수집하되 각 신규 바에 vol_ratio_20d를 계산해 채운다.
+     * 20영업일 prior 확보를 위해 from 이전 버퍼까지 KIS에서 조회하고, 평균은 응답 시계열에서 인메모리로 계산한다.
+     */
+    public int collectDailyWithVolRatio(String stockCode, LocalDate from, LocalDate to) {
+        List<DailyPriceData> asc = dailyGateway
+            .fetchDailyPrices(stockCode, from.minusDays(VOL_RATIO_BUFFER_DAYS), to).stream()
+            .sorted(Comparator.comparing(DailyPriceData::tradeDate))
+            .toList();
+
+        List<DailyPrice> toSave = new ArrayList<>();
+        for (int i = 0; i < asc.size(); i++) {
+            DailyPriceData d = asc.get(i);
+            if (d.tradeDate().isBefore(from)
+                || dailyRepository.existsByStockCodeAndTradeDate(stockCode, d.tradeDate())) {
+                continue; // 버퍼 구간·기존 날짜 스킵
+            }
+            List<Long> prior = new ArrayList<>();
+            for (int j = i - 1; j >= 0 && prior.size() < VolumeRatioCalculator.WINDOW; j--) {
+                prior.add(asc.get(j).volume());
+            }
+            BigDecimal volRatio = VolumeRatioCalculator.ratio20d(d.volume(), prior);
+            toSave.add(new DailyPrice(stockCode, d.tradeDate(), d.close(), d.changeRate(),
+                d.volume(), d.tradingValue(), volRatio, true));
+        }
+        dailyRepository.saveAll(toSave);
+        log.info("일봉+vol_ratio 수집: {} [{}~{}] 신규 {}건", stockCode, from, to, toSave.size());
+        return toSave.size();
     }
 }

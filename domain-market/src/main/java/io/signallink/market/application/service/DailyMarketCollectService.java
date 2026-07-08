@@ -34,7 +34,7 @@ public class DailyMarketCollectService {
         int total = 0;
         for (Stock stock : universe) {
             try {
-                total += priceCollectService.collectDaily(stock.getStockCode(), from, to);
+                total += priceCollectService.collectDailyWithVolRatio(stock.getStockCode(), from, to);
             } catch (RuntimeException e) {
                 log.warn("일봉 수집 실패, 종목 건너뜀: {} ({})", stock.getStockCode(), e.toString());
             }
