@@ -91,6 +91,8 @@ implementation("org.springframework.boot:spring-boot-starter-json") // Jackson (
 **엔드포인트**: `GET https://opendart.fss.or.kr/api/list.json`
 주요 파라미터: `crtfc_key`, `bgn_de`/`end_de`(YYYYMMDD), `page_no`, `page_count`(최대 100), (선택 `pblntf_ty` 공시유형).
 
+> ⚠️ **정책③ 조회 100건 제한**: 현재 `DartClient`는 단일 페이지(`page_count=100`, 코드에 TODO)라 하루 공시 100건 초과 시 유실 가능. `total_page` 순회(페이지네이션) 필요 — BACKLOG "KIS API 정책 준수 감사"(실적 시즌 등 대량 공시일 대비).
+
 **설계 포인트** (플랜 반영 필수):
 1. **corp_code vs stock_code**: DART 개별 조회는 8자리 `corp_code`(고유번호)를 쓰지만, **날짜범위 폴링(corp_code 생략)** 하면 응답에 `stock_code`(6자리)가 함께 온다 → **시장 전체 최근 공시를 폴링하고 상장사(stock_code 있음)만 남기는 방식**으로 corp_code 매핑 없이 진행. (corp_code↔stock_code 매핑 `corpCode.xml`은 M3 재무 추세에서 필요 → 그때 도입)
 2. **신규 판별**: `rcept_no`가 UNIQUE → 이미 있으면 skip. `existsByRceptNo` 또는 저장 시 제약 위반 무시. 폴링 주기는 최근 N분 겹치게(멱등).

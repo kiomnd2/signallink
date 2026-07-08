@@ -23,6 +23,14 @@
 | Python CA 번들 미보유 | 이 머신 Python 3.14가 CA 미보유 → `SSL_CERT_FILE=/etc/ssl/cert.pem` 필요 | M0 문서 §4에 기록. 필요 시 `certifi` 설치로 상시화 |
 | `.env.example` 변수명 | `KIS_APP_KEY`→`KIS_APPKEY`로 스크립트/문서와 정렬함 | 커밋 반영 필요 |
 
+## KIS API 정책 준수 감사 (2026-07-08)
+
+| 정책 | 상태 | 조치 |
+|------|------|------|
+| ① 초당 호출 유량 제한 | 인프라(`RateLimiter`·`ExternalApiClient`) O · DART 적용 O · **KIS TR 미적용**(TR 클라이언트 미구현) | 슬라이스 2 KIS 클라이언트 = `ExternalApiClient` 상속 + `RateLimiter(1.0)`(M0 실측) |
+| ② 토큰 발급 제한(24h·재사용) | ✅ 반영 — `KisTokenProvider`(DB 캐시, 만료 10분 전 재사용, 임박 시만 재발급) | — |
+| ③ 조회 100건 제한/페이지네이션 | ❌ 미반영 — `DartClient` 단일 `page_count=100`(TODO 주석), KIS 일별시세 백필 미구현 | DART: `total_page` 순회 / KIS 백필: 기간 100건 단위 분할 요청 (슬라이스 2) |
+
 ## 스펙 반영 대기 (리서치 발견 사항)
 
 - 장중 잠정 수급: `inquire-investor`(FHKST01010900)는 당일치를 장마감 후에만 제공 → 장중엔 가집계 TR(FHPTJ04400000, 하루 4~5회 갱신) 사용으로 스펙 4단계 수정 필요

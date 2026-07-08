@@ -135,11 +135,11 @@ io.signallink.market
 2. [ ] `KisTokenProvider`(발급 + **DB `kis_token` 캐시**, Flyway 마이그레이션 신설) + 실호출 검증
 3. [ ] `StockMasterGatewayPort` + 종목정보파일 어댑터 + `StockMasterSyncService`(J1)
 
-**슬라이스 2 — 일별시세 + 지수 + 백필**
+**슬라이스 2 — 일별시세 + 지수 + 백필** *(KIS 정책 준수 ①유량·③건수 — BACKLOG "KIS API 정책 준수 감사" 참조)*
 4. [ ] `DailyPrice`/`IndexPrice` 엔티티·포트·영속 어댑터 + `@DataJpaTest`
-5. [ ] 일별시세·지수 TR 어댑터(+파서 픽스처 테스트) — **TR 실검증 포함**
+5. [ ] 일별시세·지수 TR 어댑터 — **`ExternalApiClient` 상속 + `RateLimiter(1.0)`**(정책①) + 파서 픽스처 테스트 + **TR 실검증 포함**
 6. [ ] `DailyPriceCollectService`(일 수집) + `VolumeRatioCalculator`
-7. [ ] **2년 백필 커맨드**(멱등·재개·진행로그)
+7. [ ] **2년 백필 커맨드** — **기간을 100건(≈영업일) 단위로 분할 요청**(정책③ 조회 건수 제한) + 멱등·재개·진행로그
 
 **슬라이스 3 — 수급**
 8. [ ] `InvestorFlow` 엔티티·포트 + `InvestorFlowCollectService`(가집계 잠정 / inquire-investor 확정, is_final 이원화)
