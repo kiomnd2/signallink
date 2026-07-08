@@ -22,3 +22,7 @@ management:
 signallink:
   llm:
     daily-limit: ${LLM_DAILY_LIMIT:60}
+  kis:
+    base-url: https://openapi.koreainvestment.com:9443
+    app-key: ${KIS_APPKEY:}
+    app-secret: ${KIS_APPSECRET:}

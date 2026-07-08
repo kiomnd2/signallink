@@ -24,9 +24,6 @@ public record DartListResponse(
     String message,
     List<Item> list
 ) {
-    public static final String OK = "000";
-    public static final String NO_DATA = "013";
-
     private static final Logger log = LoggerFactory.getLogger(DartListResponse.class);
     private static final DateTimeFormatter YMD = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final String VIEWER_URL = "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=";

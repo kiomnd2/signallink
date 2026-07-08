@@ -23,6 +23,12 @@ subprojects {
     }
 
     dependencies {
+        // 생성자 주입은 Lombok @RequiredArgsConstructor + private final 필드로 (버전은 spring-boot BOM 관리)
+        "compileOnly"("org.projectlombok:lombok")
+        "annotationProcessor"("org.projectlombok:lombok")
+        "testCompileOnly"("org.projectlombok:lombok")
+        "testAnnotationProcessor"("org.projectlombok:lombok")
+
         "testImplementation"("org.springframework.boot:spring-boot-starter-test")
         // Gradle 9부터 launcher 자동 주입이 사라져 명시 필요 (버전은 spring-boot BOM의 junit-bom이 관리)
         "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")

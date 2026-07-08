@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import lombok.Getter;
 
 /**
  * 공시 도메인 모델 (헥사고날 Level 1 — JPA 엔티티 겸용, docs/ARCHITECTURE.md §4).
@@ -14,6 +15,7 @@ import java.time.OffsetDateTime;
  * <p>issue.disclosure 테이블 매핑. DART 접수번호(rcept_no)가 자연 유니크 키 → 중복 수집 방지의 기준.
  */
 @Entity
+@Getter
 @Table(name = "disclosure", schema = "issue")
 public class Disclosure {
 
@@ -50,12 +52,4 @@ public class Disclosure {
         this.disclosedAt = disclosedAt;
         this.dartUrl = dartUrl;
     }
-
-    public Long getId() { return id; }
-    public String getStockCode() { return stockCode; }
-    public String getReceiptNo() { return receiptNo; }
-    public String getTitle() { return title; }
-    public String getCategory() { return category; }
-    public OffsetDateTime getDisclosedAt() { return disclosedAt; }
-    public String getDartUrl() { return dartUrl; }
 }
