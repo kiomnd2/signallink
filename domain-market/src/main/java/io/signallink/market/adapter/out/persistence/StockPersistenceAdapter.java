@@ -3,6 +3,7 @@ package io.signallink.market.adapter.out.persistence;
 import io.signallink.market.application.port.out.StockRepositoryPort;
 import io.signallink.market.domain.Stock;
 import java.util.Collection;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -26,5 +27,10 @@ public class StockPersistenceAdapter implements StockRepositoryPort {
     @Override
     public long count() {
         return jpa.count();
+    }
+
+    @Override
+    public List<Stock> findAll() {
+        return jpa.findAll();
     }
 }

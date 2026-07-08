@@ -32,3 +32,7 @@ signallink:
     naver:
       client-id: ${NAVER_CLIENT_ID:}
       client-secret: ${NAVER_CLIENT_SECRET:}
+  backfill:
+    enabled: ${BACKFILL_ENABLED:false}   # true일 때만 부팅 시 1회 2년 백필 실행
+    limit: ${BACKFILL_LIMIT:300}
+    years: ${BACKFILL_YEARS:2}

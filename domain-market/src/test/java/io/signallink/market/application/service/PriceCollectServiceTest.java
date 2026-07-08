@@ -48,6 +48,7 @@ class PriceCollectServiceTest {
         @Override public boolean existsByStockCodeAndTradeDate(String stockCode, LocalDate tradeDate) {
             return existing.contains(stockCode + "|" + tradeDate);
         }
+        @Override public boolean existsByStockCode(String stockCode) { return false; }
         @Override public DailyPrice save(DailyPrice price) { saved.add(price); return price; }
         @Override public void saveAll(Collection<DailyPrice> prices) { saved.addAll(prices); }
     }

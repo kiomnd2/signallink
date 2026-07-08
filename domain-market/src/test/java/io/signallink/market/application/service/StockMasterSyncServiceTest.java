@@ -36,5 +36,6 @@ class StockMasterSyncServiceTest {
         @Override public Stock save(Stock stock) { saved.add(stock); return stock; }
         @Override public void saveAll(Collection<Stock> stocks) { saved.addAll(stocks); }
         @Override public long count() { return saved.size(); }
+        @Override public java.util.List<Stock> findAll() { return saved; }
     }
 }
