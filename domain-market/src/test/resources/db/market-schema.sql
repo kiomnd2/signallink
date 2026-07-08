@@ -15,3 +15,24 @@ CREATE TABLE market.kis_token (
   issued_at    timestamptz NOT NULL,
   expires_at   timestamptz NOT NULL
 );
+
+CREATE TABLE market.daily_price (
+  id            bigserial PRIMARY KEY,
+  stock_code    varchar(6) NOT NULL,
+  trade_date    date NOT NULL,
+  close         numeric(12,2) NOT NULL,
+  change_rate   numeric(6,3) NOT NULL,
+  volume        bigint NOT NULL,
+  trading_value bigint NOT NULL,
+  vol_ratio_20d numeric(6,2),
+  is_final      boolean NOT NULL DEFAULT false,
+  UNIQUE (stock_code, trade_date)
+);
+
+CREATE TABLE market.index_price (
+  index_code    varchar(10) NOT NULL,
+  trade_date    date NOT NULL,
+  close         numeric(12,2) NOT NULL,
+  change_rate   numeric(6,3) NOT NULL,
+  PRIMARY KEY (index_code, trade_date)
+);
