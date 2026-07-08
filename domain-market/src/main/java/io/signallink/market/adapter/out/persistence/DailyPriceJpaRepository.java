@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DailyPriceJpaRepository extends JpaRepository<DailyPrice, Long> {
 
     boolean existsByStockCodeAndTradeDate(String stockCode, LocalDate tradeDate);
+
+    boolean existsByStockCode(String stockCode);
 }

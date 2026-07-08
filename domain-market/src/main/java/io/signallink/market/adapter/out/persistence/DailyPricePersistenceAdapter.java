@@ -20,6 +20,11 @@ public class DailyPricePersistenceAdapter implements DailyPriceRepositoryPort {
     }
 
     @Override
+    public boolean existsByStockCode(String stockCode) {
+        return jpa.existsByStockCode(stockCode);
+    }
+
+    @Override
     public DailyPrice save(DailyPrice price) {
         return jpa.save(price);
     }
