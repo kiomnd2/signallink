@@ -26,3 +26,9 @@ signallink:
     base-url: https://openapi.koreainvestment.com:9443
     app-key: ${KIS_APPKEY:}
     app-secret: ${KIS_APPSECRET:}
+  issue:
+    dart:
+      api-key: ${DART_API_KEY:}
+    naver:
+      client-id: ${NAVER_CLIENT_ID:}
+      client-secret: ${NAVER_CLIENT_SECRET:}

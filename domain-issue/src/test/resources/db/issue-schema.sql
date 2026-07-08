@@ -10,3 +10,14 @@ CREATE TABLE issue.disclosure (
   disclosed_at timestamptz NOT NULL,
   dart_url     varchar(300) NOT NULL
 );
+
+CREATE TABLE issue.news (
+  id           bigserial PRIMARY KEY,
+  stock_code   varchar(6) NOT NULL,
+  title        varchar(300) NOT NULL,
+  summary      text,
+  url          varchar(500) NOT NULL,
+  source       varchar(50),
+  published_at timestamptz NOT NULL,
+  UNIQUE (stock_code, url)
+);

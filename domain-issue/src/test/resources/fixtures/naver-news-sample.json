@@ -1,0 +1,22 @@
+{
+  "lastBuildDate": "Wed, 08 Jul 2026 09:00:00 +0900",
+  "total": 2,
+  "start": 1,
+  "display": 2,
+  "items": [
+    {
+      "title": "<b>삼성전자</b>, 2분기 &quot;깜짝 실적&quot;",
+      "originallink": "https://www.example-news.com/article/123",
+      "link": "https://n.news.naver.com/mnews/article/001/0001",
+      "description": "<b>삼성전자</b>가 예상을 웃도는 실적을 발표했다 &amp; 주가 상승.",
+      "pubDate": "Wed, 08 Jul 2026 08:30:00 +0900"
+    },
+    {
+      "title": "삼성전자 신제품 공개",
+      "originallink": "https://tech.example.com/n/456",
+      "link": "https://n.news.naver.com/mnews/article/002/0002",
+      "description": "신제품 발표 &lt;현장&gt;",
+      "pubDate": "Wed, 08 Jul 2026 07:00:00 +0900"
+    }
+  ]
+}
