@@ -36,3 +36,8 @@ signallink:
     enabled: ${BACKFILL_ENABLED:false}   # true일 때만 부팅 시 1회 2년 백필 실행
     limit: ${BACKFILL_LIMIT:300}
     years: ${BACKFILL_YEARS:2}
+  collect:
+    daily-cron: ${COLLECT_CRON:0 30 16 * * MON-FRI}   # 평일 16:30 KST (장마감 후)
+    limit: ${COLLECT_LIMIT:300}
+    recent-days: ${COLLECT_RECENT_DAYS:5}
+    index-codes: ${COLLECT_INDEX_CODES:0001,1001}     # 0001=KOSPI, 1001=KOSDAQ
