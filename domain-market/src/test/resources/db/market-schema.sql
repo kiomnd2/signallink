@@ -47,3 +47,9 @@ CREATE TABLE market.investor_flow (
   is_final      boolean NOT NULL DEFAULT false,
   UNIQUE (stock_code, trade_date, investor_type)
 );
+
+CREATE TABLE market.stock_beta (
+  stock_code    varchar(6) PRIMARY KEY,
+  beta_60d      numeric(6,3) NOT NULL,
+  calculated_at date NOT NULL
+);
