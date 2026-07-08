@@ -22,6 +22,7 @@
 | RateLimiter 설정값 | 실측 초당 1건 → M2 KIS 클라이언트에서 `RateLimiter(1.0)`(안전 0.8) | M2 market 구현 시 적용 |
 | Python CA 번들 미보유 | 이 머신 Python 3.14가 CA 미보유 → `SSL_CERT_FILE=/etc/ssl/cert.pem` 필요 | M0 문서 §4에 기록. 필요 시 `certifi` 설치로 상시화 |
 | `.env.example` 변수명 | `KIS_APP_KEY`→`KIS_APPKEY`로 스크립트/문서와 정렬함 | 커밋 반영 필요 |
+| ⚠️ KIS 토큰 재발급 제한 발동 (2026-07-08) | 검증 중 파일 캐시(`~/.kis_token.json`) 삭제 + 반복 발급 시도 → tokenP HTTP 403(제한/IP 차단 가능) | ~1시간 대기 후 **1회만** 발급. **토큰 캐시 절대 삭제 금지** — 앱 `KisTokenProvider`는 DB 캐시라 재발급 안 함(무관). 슬라이스 2 TR 검증은 회복 후 |
 
 ## KIS API 정책 준수 감사 (2026-07-08)
 
