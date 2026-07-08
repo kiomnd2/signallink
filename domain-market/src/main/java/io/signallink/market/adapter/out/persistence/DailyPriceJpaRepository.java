@@ -14,4 +14,6 @@ public interface DailyPriceJpaRepository extends JpaRepository<DailyPrice, Long>
     boolean existsByStockCode(String stockCode);
 
     List<DailyPrice> findByStockCodeOrderByTradeDateDesc(String stockCode, Pageable pageable);
+
+    List<DailyPrice> findByTradeDate(LocalDate tradeDate);
 }
