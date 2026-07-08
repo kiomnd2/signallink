@@ -154,7 +154,7 @@ DART는 워치리스트 무관(시장 전체 폴링 후 stock_code 필터)이라
 
 ## 9. 구현 순서 (체크리스트)
 
-> **진행 현황 (2026-07-08)**: 공시(DART) 세로 슬라이스 **완료 — PR #3 머지**. 코드 리뷰 High 3건(파싱 건별 skip·수집 예외 격리·상태코드 예외화) 반영, 단위 테스트 16건. 남음: 뉴스(7~8) · 설정/스케줄러(9~10) · 실호출 dry-run(11).
+> **진행 현황 (2026-07-08)**: 공시(DART)·뉴스(네이버) 세로 슬라이스 **완료**. 설정 바인딩(9)·스케줄러 배선(10, `DisclosureJob`·`NewsJob`) 완료. 남음: 실호출 dry-run(11, 키 채우고 하루 돌려 row/null 검증).
 
 1. [x] `domain-issue/build.gradle.kts`에 spring-web + starter-json 추가, 빌드 확인
 2. [x] `domain/`: 엔티티 `Disclosure` (@Entity 겸 도메인) + `application/port/out`: `DisclosureRepositoryPort` *(News 엔티티는 뉴스 슬라이스에서)*
@@ -162,10 +162,10 @@ DART는 워치리스트 무관(시장 전체 폴링 후 stock_code 필터)이라
 4. [x] `domain/`: `DisclosureCategoryClassifier` + 룰 단위 테스트
 5. [x] `application/port/out`: `DartGatewayPort` + `adapter/out/external`: `DartClient`·`DartListResponse` + 픽스처 파서 테스트 (+ 상태코드 해석 `interpret()`)
 6. [x] `application/service`: `DisclosureCollectService` (포트 주입: DartGateway→필터→RepositoryPort 저장) + 스텁 포트 서비스 단위 테스트 (+ 건별 예외 격리)
-7. [ ] `application/port/out`: `NaverNewsGatewayPort`·`WatchlistPort` + `adapter/out/external`: `NaverNewsClient`·`NaverNewsResponse`(태그 제거) + 픽스처 파서 테스트
-8. [ ] `adapter/out/persistence`: `SeedWatchlistAdapter`(시드 CSV, §8) + `application/service`: `NewsCollectService`(WatchlistPort 주입 구동)
-9. [ ] `IssueApiProperties` + application.yml `signallink.issue.*` 바인딩
-10. [ ] app-collector 인바운드 어댑터 `DisclosureJob`·`NewsJob` (`@Scheduled` → `*CollectService` 호출), HeartbeatJob 제거
+7. [x] `application/port/out`: `NaverNewsGatewayPort`·`WatchlistPort` + `adapter/out/external`: `NaverNewsClient`·`NaverNewsResponse`(태그 제거) + 픽스처 파서 테스트
+8. [x] `adapter/out/persistence`: `SeedWatchlistAdapter`(시드 CSV, §8) + `application/service`: `NewsCollectService`(WatchlistPort 주입 구동)
+9. [x] application.yml `signallink.issue.*` 바인딩 (`@Value` 직접 주입 — 클라이언트별 `base-url`/키/`permits-per-second`)
+10. [x] app-collector 인바운드 어댑터 `DisclosureJob`·`NewsJob` (`@Scheduled` → `*CollectService` 호출) — 장중 30분 주기(공시 `0/30`, 뉴스 `15/30` 엇갈림), KST
 11. [ ] 키 채우고 로컬 드라이런 → row/null 검증
 
 **의존 순**: 1→2→(3·4 병행)→5→6→7→8→9→10→11. 키 없으면 1~7까지(도메인·포트·어댑터·파서·룰·서비스 단위 테스트) 먼저 — 포트 스텁 덕에 실호출 없이 서비스까지 검증 가능.
