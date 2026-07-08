@@ -36,3 +36,14 @@ CREATE TABLE market.index_price (
   change_rate   numeric(6,3) NOT NULL,
   PRIMARY KEY (index_code, trade_date)
 );
+
+CREATE TABLE market.investor_flow (
+  id            bigserial PRIMARY KEY,
+  stock_code    varchar(6) NOT NULL,
+  trade_date    date NOT NULL,
+  investor_type varchar(20) NOT NULL,
+  net_buy_qty   bigint NOT NULL,
+  net_buy_amt   bigint NOT NULL,
+  is_final      boolean NOT NULL DEFAULT false,
+  UNIQUE (stock_code, trade_date, investor_type)
+);

@@ -1,0 +1,25 @@
+{
+  "rt_cd": "0",
+  "msg1": "정상처리 되었습니다.",
+  "output": [
+    {
+      "stck_bsop_date": "20260708",
+      "stck_clpr": "277500",
+      "prsn_ntby_qty": "2035163",
+      "frgn_ntby_qty": "-3015122",
+      "orgn_ntby_qty": "967667",
+      "prsn_ntby_tr_pbmn": "584689",
+      "frgn_ntby_tr_pbmn": "-870971",
+      "orgn_ntby_tr_pbmn": "282709"
+    },
+    {
+      "stck_bsop_date": "20260707",
+      "prsn_ntby_qty": "100",
+      "frgn_ntby_qty": "200",
+      "orgn_ntby_qty": "300",
+      "prsn_ntby_tr_pbmn": "1",
+      "frgn_ntby_tr_pbmn": "2",
+      "orgn_ntby_tr_pbmn": "3"
+    }
+  ]
+}

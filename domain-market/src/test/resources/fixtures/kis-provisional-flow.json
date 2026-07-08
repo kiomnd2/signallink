@@ -1,0 +1,22 @@
+{
+  "rt_cd": "0",
+  "msg1": "정상처리 되었습니다.",
+  "output": [
+    {
+      "hts_kor_isnm": "LG디스플레이",
+      "mksc_shrn_iscd": "034220",
+      "frgn_ntby_qty": "1303000",
+      "orgn_ntby_qty": "322000",
+      "frgn_ntby_tr_pbmn": "14600",
+      "orgn_ntby_tr_pbmn": "3600"
+    },
+    {
+      "hts_kor_isnm": "삼성전자",
+      "mksc_shrn_iscd": "005930",
+      "frgn_ntby_qty": "-3015122",
+      "orgn_ntby_qty": "967667",
+      "frgn_ntby_tr_pbmn": "-870971",
+      "orgn_ntby_tr_pbmn": "282709"
+    }
+  ]
+}
