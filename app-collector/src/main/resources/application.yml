@@ -49,3 +49,7 @@ signallink:
   beta:
     weekly-cron: ${BETA_CRON:0 0 6 * * SAT}           # 토요일 06:00 KST
     limit: ${BETA_LIMIT:300}
+  investor-flow:
+    provisional-cron: ${INVESTOR_PROVISIONAL_CRON:0 0/30 9-15 * * MON-FRI}  # 장중 30분 (가집계 잠정)
+    confirmed-cron: ${INVESTOR_CONFIRMED_CRON:0 40 16 * * MON-FRI}          # 시세 배치(16:30) 이후 확정
+    confirmed-limit: ${INVESTOR_CONFIRMED_LIMIT:300}
