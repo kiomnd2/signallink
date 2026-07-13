@@ -3,6 +3,7 @@ package io.signallink.market.adapter.out.persistence;
 import io.signallink.market.domain.InvestorFlow;
 import io.signallink.market.domain.InvestorType;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -11,4 +12,6 @@ public interface InvestorFlowJpaRepository extends JpaRepository<InvestorFlow, L
 
     Optional<InvestorFlow> findByStockCodeAndTradeDateAndInvestorType(
         String stockCode, LocalDate tradeDate, InvestorType investorType);
+
+    List<InvestorFlow> findByStockCodeAndTradeDate(String stockCode, LocalDate tradeDate);
 }

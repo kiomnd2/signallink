@@ -18,7 +18,7 @@
 ## 2. 서브슬라이스 (구현 순서)
 - **3-A 특징주 선정**: 당일 `daily_price`에서 **±5% 또는 거래량 3배** → **거래대금 상위 40** 선정. (거래량 3배 = `vol_ratio_20d` 필요 → §4 선결)
 - **3-B 시장분해·업종판별**: `market_contrib = β × 지수등락률`, 초과분(등락률−market_contrib) 해석 + 업종 동반등락(sector_sync) → `what_happened` 템플릿 문장
-- **3-C 수급 진단**: `investor_flow`(외국인·기관·개인) → `flow_summary`(장중은 "잠정")
+- **3-C 수급 진단**: ✅ `investor_flow`(외국인·기관) → `flow_summary`(장중은 "잠정"). `FlowDiagnoser`(순수) + `FlowDiagnoseService`, market `InvestorFlowQueryPort`로 읽기. 개인은 노이즈·가집계 미제공이라 제외, |순매수|<1억은 중립.
 - **3-D 이슈 매칭**: 공시 우선 + 뉴스 시간창 필터 → 후보 정리 → `source_refs`(jsonb)
 - **3-E LLM 클라이언트**: 페이로드 조립 → Gemini 3 Flash → JSON 파싱 → **금지어(매수/매도/목표가) 필터** → 실패 시 템플릿 폴백 → **일 상한 가드**
 - **3-F J2 파이프라인**: 30분 배치, 선정→분석→카드 upsert, **종목 단위 예외 격리** + Discord 실패 알림
