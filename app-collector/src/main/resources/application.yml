@@ -20,8 +20,12 @@ management:
         include: health,info
 
 signallink:
+  discord:
+    webhook-url: ${DISCORD_WEBHOOK_URL:}       # 비면 no-op (로컬)
   llm:
     daily-limit: ${LLM_DAILY_LIMIT:60}
+  feature-card:
+    cron: ${FEATURE_CARD_CRON:0 5/30 9-15 * * MON-FRI}   # 장중 30분 (Why 카드 생성)
   kis:
     base-url: https://openapi.koreainvestment.com:9443
     app-key: ${KIS_APPKEY:}
