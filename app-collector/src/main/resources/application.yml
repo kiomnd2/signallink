@@ -32,6 +32,11 @@ signallink:
     naver:
       client-id: ${NAVER_CLIENT_ID:}
       client-secret: ${NAVER_CLIENT_SECRET:}
+    disclosure:
+      cron: ${DISCLOSURE_CRON:0 0/30 8-20 * * MON-FRI}   # 장중 30분 주기 (KST)
+      days-back: ${DISCLOSURE_DAYS_BACK:1}               # 겹치게 폴링(멱등)
+    news:
+      cron: ${NEWS_CRON:0 15/30 8-20 * * MON-FRI}        # 장중 30분 주기 (공시와 15분 엇갈림)
   backfill:
     enabled: ${BACKFILL_ENABLED:false}   # true일 때만 부팅 시 1회 2년 백필 실행
     limit: ${BACKFILL_LIMIT:300}
