@@ -3,7 +3,9 @@ package io.signallink.market.application.service;
 import io.signallink.market.application.port.out.InvestorFlowData;
 import io.signallink.market.application.port.out.InvestorFlowGatewayPort;
 import io.signallink.market.application.port.out.InvestorFlowRepositoryPort;
+import io.signallink.market.application.port.out.StockRepositoryPort;
 import io.signallink.market.domain.InvestorFlow;
+import io.signallink.market.domain.Stock;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -24,6 +26,26 @@ public class InvestorFlowCollectService {
 
     private final InvestorFlowGatewayPort gateway;
     private final InvestorFlowRepositoryPort repository;
+    private final StockRepositoryPort stockRepository;
+
+    /**
+     * 마감 확정 수급 — 유니버스 상위 {@code limit}종목을 종목별로 조회·upsert.
+     *
+     * <p>종목 단위 예외 격리 — 하나가 실패해도 배치 전체는 계속(플랜 §5). @return 반영 총 건수
+     */
+    public int collectConfirmedAll(int limit) {
+        List<Stock> universe = stockRepository.findAll().stream().limit(limit).toList();
+        int total = 0;
+        for (Stock stock : universe) {
+            try {
+                total += collectConfirmed(stock.getStockCode());
+            } catch (RuntimeException e) {
+                log.warn("확정 수급 수집 실패, 종목 건너뜀: {} ({})", stock.getStockCode(), e.toString());
+            }
+        }
+        log.info("확정 수급 수집: 종목 {} → 반영 {}건", universe.size(), total);
+        return total;
+    }
 
     /** 마감 확정 수급(종목별). @return 반영 건수 */
     public int collectConfirmed(String stockCode) {

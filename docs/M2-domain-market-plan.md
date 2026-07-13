@@ -148,7 +148,8 @@ io.signallink.market
 9. [ ] `BetaCalculator` + `StockBetaService`(주간) — 백필 데이터로 재현 검증
 
 **스케줄러(collector)**
-10. [ ] `app-collector`에 J1(일 1회)·일별시세 수집(마감 후)·수급(장중 30분+마감)·J7(주간) `@Scheduled` + 휴장일 캘린더
+10. [x] `app-collector`에 J1(일 1회)·일별시세 수집(마감 후)·수급(장중 30분+마감)·J7(주간) `@Scheduled`
+    - `MarketCollectJob`(J1+시세, 평일 16:30) · `StockBetaJob`(토 06:00) · `InvestorFlowJob`(잠정 장중 30분 `0 0/30 9-15` + 확정 16:40) 배선 완료. 휴장일은 cron 요일 가드 + 멱등 수집이 흡수.
 
 각 슬라이스는 `domain-issue`처럼 **PR 단위**로 끊고, 완료 후 이 문서 §9와 `docs/1.이후-구현플랜.md`를 갱신(문서 동기화 규칙).
 
