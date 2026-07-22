@@ -48,11 +48,11 @@ macro.asset_reaction(event_id→macro_event, asset_code, d1_return, d7_return, d
 
 ### 3-7 health_check — 비용 순
 
-#### 3-7a · 이슈 성격 태그 🟢 지금 가능 (먼저)
-- **입력**: 기존 `IssueMatch`/`source_refs`(공시 카테고리·뉴스 제목).
-- **신규**: `IssueNatureClassifier`(순수, 공시 카테고리·키워드 룰 → 일회성/구조적/분류불가) + LLM 보조(3-E 재사용) +
-  `HealthCheckUpsert`/`HealthCheckRepositoryPort`/영속 어댑터. **제약 #1 해결**(upsert→card_id).
-- **배선**: J2 파이프라인에서 카드 upsert 직후 health_check 기록.
+#### 3-7a · 이슈 성격 태그 ✅ 완료 (2026-07-22)
+- `IssueNature`(enum) + `IssueNatureClassifier`(순수, 구조적 키워드 우선 보수 판정) + `HealthCheck`(엔티티)·
+  `HealthCheckRepositoryPort`/`HealthCheckUpsert`/`HealthCheckPersistenceAdapter`. `upsert→card_id` 반환(제약 #1 해결).
+- J2 파이프라인에서 카드 upsert 직후 태그 기록. (LLM 보조 재분류는 BACKLOG.)
+- 보고서 `docs/reports/2026-07-22-m3-3-7-health-check.md`.
 
 #### 3-7b · 수급 추세 flow_after (J6) 🟢 지금 가능
 - **입력**: market `InvestorFlowQueryPort`.
@@ -60,10 +60,13 @@ macro.asset_reaction(event_id→macro_event, asset_code, d1_return, d7_return, d
   **J6 스케줄 잡**(app-collector, 마감 후 D+1~D+5 갱신) + `flow_after` jsonb 직렬화(`SourceRefsJson` 패턴).
 - health_check가 이미 있는 카드를 대상으로 갱신 → `(stock,date)→card_id` 조회 필요(제약 #1과 동일 기반).
 
-#### 3-7c · 실적 추세 (DART 재무) 🟡 신규 외부 소스 (가장 뒤/독립 슬라이스)
-- **신규**: issue 도메인에 **DART 재무제표 API 어댑터**(예: 단일회사 주요계정 `fnlttSinglAcnt`) +
-  `FinancialTrendPort` + `TrendCalculator`(순수, 최근 4분기 매출·영업이익 방향). MockWebServer HTTP 테스트(DART 패턴).
-- **완충**: 미구현/미매칭 시 `revenue_trend=null`("데이터 없음") → 카드 깨지지 않음. Exit 완결 전까지 뒤로 미뤄도 무방.
+#### 3-7c · 실적 추세 (DART 재무) ✅ 배선 완료 (2026-07-22, 실호출·corp_code 잔여)
+- issue: `QuarterAccount`/`CompanyFinancials`(표현) + `DartFinancialGatewayPort`·`DartFinancialClient`
+  (`fnlttSinglAcnt.json`, 연결 우선) + `FinancialQueryPort`·`DartFinancialQueryService` + `CorpCodeResolver`.
+- insight: `FinancialTrend`·`FinancialTrendAnalyzer`(순수, ±5%·적자부호 처리) + `FinancialTrendService`
+  (`financials-enabled` 게이트, 기본 false) → 파이프라인이 `revenue_trend`/`profit_trend` 기록.
+- **잔여**: `CorpCodeResolver` 실구현(corpCode.xml)·DART 재무 실호출 검증·`financials-enabled=true`. 그 전까지 null("데이터 없음").
+- MockWebServer HTTP 테스트로 배선 검증. 보고서 동일.
 
 ### 3-8 macro — 빈 모듈부터
 
@@ -83,12 +86,12 @@ macro.asset_reaction(event_id→macro_event, asset_code, d1_return, d7_return, d
 ## 4. 권장 순서
 
 ```
-지금 (기존 데이터로 완결 가능):
-  3-7a 이슈 성격 태그  →  3-7b flow_after(J6)  →  3-8a macro 골격  →  3-8b asset_reaction(J5)+백필
+완료(2026-07-22): 3-7a 이슈 성격 태그 ✅ · 3-7c DART 재무추세 배선 ✅(실호출·corp_code 잔여)
 
-무거움/의존 있음 (뒤로 또는 M4와):
-  3-7c DART 재무추세 (신규 외부 소스 — 독립 슬라이스로 언제든)
-  3-8c macro_event 라이브 기록 (M4 J4 신호등과 묶기)
+다음:
+  3-7b flow_after(J6)  →  3-8a macro 골격  →  3-8b asset_reaction(J5)+백필
+
+의존 있음 (M4와): 3-8c macro_event 라이브 기록 (M4 J4 신호등과 묶기)
 ```
 
 **착수 추천**: 데이터가 이미 있고 가장 저렴한 **3-7a(이슈 성격 태그)**. 여기서 `upsert→card_id` +
