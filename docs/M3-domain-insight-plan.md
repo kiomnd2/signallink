@@ -22,7 +22,7 @@
 - **3-D 이슈 매칭**: ✅ 공시 우선 + 뉴스 시간창 필터 → 후보 정리 → `source_refs`(jsonb). `IssueMatcher`(순수, 공시 우선·최신순·최대 3건) + `IssueMatchService`(거래일 KST 하루 시간창), issue `IssueQueryPort`로 읽기. jsonb 직렬화는 3-F에서.
 - **3-E LLM 클라이언트**: ✅ 페이로드 조립 → Gemini `generateContent` → JSON 파싱 → **금지어(매수/매도/목표가) 필터** → 실패 시 템플릿 폴백 → **일 상한 가드**. `WhyContext`+`WhyPromptComposer`+`BannedWordFilter`(순수) + `WhySummaryService`(뉴스/공시 있는 종목만·거래일 상한) + `GeminiClient`(`LlmGatewayPort`). 기본 `LLM_ENABLED=false`(키 발급 전 템플릿 유지). **실호출·모델 ID 검증은 키 발급 후 잔여**(BACKLOG). 보고서 `docs/reports/2026-07-22-m3-3e-llm-summary.md`
 - **3-F J2 파이프라인**: ✅ 30분 배치, 선정→분석→카드 upsert, **종목 단위 예외 격리** + Discord 실패 알림. `FeatureCardPipelineService`(3-A~3-D 조립) + `FeatureCardJob`(app-collector, 장중 30분). LLM(3-E) 전이라 what_happened는 템플릿 폴백·`llm_used=false`. source_refs는 jsonb(수동 직렬화, 어댑터).
-- (3-G health_check · 3-H macro는 후속 — 플랜상 5번(LLM)까지면 M4 진행 가능)
+- (3-G health_check · 3-H macro는 후속 — 플랜상 5번(LLM)까지면 M4 진행 가능) → **상세 플랜: `docs/M3-health-check-macro-plan.md`** (체력 진단 3종 팩트·거시 이벤트, 서브슬라이스·의존성·권장 순서)
 
 ## 3. 계산·판정 로직 (순수 도메인, 단독 테스트)
 - **시장분해**: `초과등락 = change_rate − beta_60d × index_change_rate`. market_contrib 저장.
