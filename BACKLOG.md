@@ -33,6 +33,16 @@
 | ② 토큰 발급 제한(24h·재사용) | ✅ 반영 — `KisTokenProvider`(DB 캐시, 만료 10분 전 재사용, 임박 시만 재발급) | — |
 | ③ 조회 100건 제한/페이지네이션 | ❌ 미반영 — `DartClient` 단일 `page_count=100`(TODO 주석), KIS 일별시세 백필 미구현 | DART: `total_page` 순회 / KIS 백필: 기간 100건 단위 분할 요청 (슬라이스 2) |
 
+## 체력 진단 3-7 후속 (2026-07-22 3-7a·3-7c 완료 후)
+
+| 항목 | 내용 | 후속 |
+|------|------|------|
+| corp_code 리졸버 실구현 | `NoOpCorpCodeResolver`가 항상 empty → 실적 추세 미채움 | DART corpCode.xml(전체 상장사) 다운로드·캐시로 stock_code→corp_code 매핑 구현 후 빈 교체 |
+| DART 재무 실호출 검증 | `DartFinancialClient` 목테스트만 완료 | 키 발급 후 실데이터로 계정명(매출액/영업이익 표기 변형)·분기 선택 튜닝 + `financials-enabled=true` |
+| 재무 조회 비용 분리 | 파이프라인(30분)에서 종목당 최대 8콜 가능 | 활성화 전 분기 1회 갱신 잡으로 분리 검토(재무는 분기 단위) |
+| 이슈 성격 LLM 보조 | 룰 기반만 — UNCLASSIFIED 애매 케이스 | 3-E LLM으로 재분류 |
+| 3-7b 수급 추세(flow_after, J6) | 미착수 | market `InvestorFlowQueryPort`로 D+1~ 추적, J6 잡 |
+
 ## 스펙 반영 대기 (리서치 발견 사항)
 
 - 장중 잠정 수급: `inquire-investor`(FHKST01010900)는 당일치를 장마감 후에만 제공 → 장중엔 가집계 TR(FHPTJ04400000, 하루 4~5회 갱신) 사용으로 스펙 4단계 수정 필요
