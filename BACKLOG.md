@@ -9,7 +9,7 @@
 | 1 | ✅ M0 KIS 실검증 (토큰→TR 4종→한도 실측) | **완료 2026-07-08** — TR 4종 rt_cd=0, 한도 실측 초당 ~1건 | — | docs/M0-kis-verification.md §4 |
 | 2 | ✅ KIS 신규 고객 초당 한도 확인 | **완료** — 실측 초당 ~1건 (공지대로 하향 확인) | — | 〃 §4 |
 | 3 | VPS에서 KIS 호출 검증 (IP 차단 여부) | VPS 미계약 | 국내 VPS 2vCPU/4GB | 〃 |
-| 4 | LLM 검증 (실데이터 1건 → 프롬프트 → 금지어 필터) | 1번 선행 + Gemini 키 | Gemini API 키 | 〃 |
+| 4 | LLM 실호출 검증 (실데이터 1건 → 프롬프트 → 금지어 필터) | Gemini 키 발급 | Gemini API 키 | 3-E 배선·목테스트 완료(`docs/reports/2026-07-22-m3-3e-llm-summary.md`) → **정확한 모델 ID 확정 + 실호출 품질/필터 확인 + `LLM_ENABLED=true` 활성화**만 잔여 |
 | 5 | VPS 배포 워크플로 시크릿 등록 (VPS_HOST/USER/SSH_KEY, GHCR) | VPS 미계약 | 3번 완료 후 | .github/workflows/deploy.yml |
 | 6 | 나머지 API 키 발급 (OpenDART·네이버·FRED·ECOS·KOSIS) | 즉시 가능 — 본인 신청 | 각 포털 가입 | 구현플랜 M0 |
 | 7 | DART·네이버 실호출 검증 (KIS의 m0-kis-verify 대응) | 6번 선행 (실키 필요) | 발급 키 | HTTP 배선은 MockWebServer로 검증 완료(`docs/reports/2026-07-22-issue-외부API-HTTP테스트.md`) → **실호출로 응답 스키마·키 유효성 확인 + 픽스처 갱신**만 잔여 |

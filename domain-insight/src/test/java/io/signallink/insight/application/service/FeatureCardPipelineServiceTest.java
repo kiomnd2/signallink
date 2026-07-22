@@ -58,12 +58,18 @@ class FeatureCardPipelineServiceTest {
         });
     }
 
+    /** LLM 비활성 서비스 — summarize()가 항상 empty를 돌려 템플릿 폴백(llm_used=false). */
+    private WhySummaryService llmDisabled() {
+        return new WhySummaryService(prompt -> "미사용", false, 60);
+    }
+
     @Test
     void 선정된_종목마다_분석을_조립해_카드로_upsert한다() {
         var flowService = new FlowDiagnoseService((stock, date) -> List.of(
             new InvestorFlowRow(InvestorType.FOREIGN, 100, 3000, true)));
         var pipeline = new FeatureCardPipelineService(
-            selectWith("005930", "000660"), marketService(), flowService, issueServiceWithDisclosure(), cardRepo);
+            selectWith("005930", "000660"), marketService(), flowService,
+            issueServiceWithDisclosure(), llmDisabled(), cardRepo);
 
         int done = pipeline.generate(D);
 
@@ -80,6 +86,24 @@ class FeatureCardPipelineServiceTest {
     }
 
     @Test
+    void LLM_요약_성공시_그_문장을_whatHappened로_쓰고_llmUsed_true다() {
+        var flowService = new FlowDiagnoseService((stock, date) -> List.of(
+            new InvestorFlowRow(InvestorType.FOREIGN, 100, 3000, true)));
+        // 이슈가 있으면(공시) LLM 호출됨 → 클린 요약 반환하는 스텁
+        var llmEnabled = new WhySummaryService(
+            prompt -> "오늘은 공급계약 공시가 나오면서 주가가 크게 올랐어요.", true, 60);
+        var pipeline = new FeatureCardPipelineService(
+            selectWith("005930"), marketService(), flowService,
+            issueServiceWithDisclosure(), llmEnabled, cardRepo);
+
+        pipeline.generate(D);
+
+        FeatureCardUpsert card = cardRepo.saved.get(0);
+        assertThat(card.llmUsed()).isTrue();
+        assertThat(card.whatHappened()).isEqualTo("오늘은 공급계약 공시가 나오면서 주가가 크게 올랐어요.");
+    }
+
+    @Test
     void 한_종목이_실패해도_나머지_카드는_계속_생성된다() {
         // 000660 수급 조회에서 예외 → 그 종목만 건너뜀
         var flowService = new FlowDiagnoseService((stock, date) -> {
@@ -89,7 +113,8 @@ class FeatureCardPipelineServiceTest {
             return List.of(new InvestorFlowRow(InvestorType.FOREIGN, 100, 3000, true));
         });
         var pipeline = new FeatureCardPipelineService(
-            selectWith("005930", "000660"), marketService(), flowService, issueServiceWithDisclosure(), cardRepo);
+            selectWith("005930", "000660"), marketService(), flowService,
+            issueServiceWithDisclosure(), llmDisabled(), cardRepo);
 
         int done = pipeline.generate(D);
 
