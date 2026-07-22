@@ -23,7 +23,13 @@ signallink:
   discord:
     webhook-url: ${DISCORD_WEBHOOK_URL:}       # 비면 no-op (로컬)
   llm:
+    enabled: ${LLM_ENABLED:false}              # 기본 off — Gemini 키 발급 전까지 템플릿 폴백만
     daily-limit: ${LLM_DAILY_LIMIT:60}
+    gemini:
+      base-url: https://generativelanguage.googleapis.com
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-3-flash}    # 실호출 검증 시 정확한 ID 확인 후 덮어쓰기(BACKLOG)
+      permits-per-second: ${GEMINI_PPS:1}
   feature-card:
     cron: ${FEATURE_CARD_CRON:0 5/30 9-15 * * MON-FRI}   # 장중 30분 (Why 카드 생성)
   kis:
