@@ -12,6 +12,7 @@
 | 4 | LLM 검증 (실데이터 1건 → 프롬프트 → 금지어 필터) | 1번 선행 + Gemini 키 | Gemini API 키 | 〃 |
 | 5 | VPS 배포 워크플로 시크릿 등록 (VPS_HOST/USER/SSH_KEY, GHCR) | VPS 미계약 | 3번 완료 후 | .github/workflows/deploy.yml |
 | 6 | 나머지 API 키 발급 (OpenDART·네이버·FRED·ECOS·KOSIS) | 즉시 가능 — 본인 신청 | 각 포털 가입 | 구현플랜 M0 |
+| 7 | DART·네이버 실호출 검증 (KIS의 m0-kis-verify 대응) | 6번 선행 (실키 필요) | 발급 키 | HTTP 배선은 MockWebServer로 검증 완료(`docs/reports/2026-07-22-issue-외부API-HTTP테스트.md`) → **실호출로 응답 스키마·키 유효성 확인 + 픽스처 갱신**만 잔여 |
 
 ## M0 실측 후속 이슈 (2026-07-08 검증에서 발견)
 
