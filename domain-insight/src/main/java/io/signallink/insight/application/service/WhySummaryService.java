@@ -6,6 +6,7 @@ import io.signallink.insight.domain.WhyContext;
 import io.signallink.insight.domain.WhyPromptComposer;
 import java.time.LocalDate;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,25 +22,21 @@ import org.springframework.stereotype.Service;
  * Gemini 키 발급 전까지 기존 템플릿 동작 유지). 일 상한은 처리 중인 거래일 기준 인메모리 카운터.
  */
 @Service
+@RequiredArgsConstructor
 public class WhySummaryService {
 
     private static final Logger log = LoggerFactory.getLogger(WhySummaryService.class);
 
     private final LlmGatewayPort llm;
+
+    @Value("${signallink.llm.enabled:false}")
     private final boolean enabled;
+
+    @Value("${signallink.llm.daily-limit:60}")
     private final int dailyLimit;
 
     private LocalDate budgetDate;
     private int used;
-
-    public WhySummaryService(
-            LlmGatewayPort llm,
-            @Value("${signallink.llm.enabled:false}") boolean enabled,
-            @Value("${signallink.llm.daily-limit:60}") int dailyLimit) {
-        this.llm = llm;
-        this.enabled = enabled;
-        this.dailyLimit = dailyLimit;
-    }
 
     /** @return LLM 요약(성공·클린), 비활성/이슈없음/상한초과/실패/금지어면 empty(템플릿 폴백). */
     public Optional<String> summarize(WhyContext ctx, LocalDate tradeDate) {
