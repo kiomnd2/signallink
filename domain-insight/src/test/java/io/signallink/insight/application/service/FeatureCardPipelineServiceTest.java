@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.signallink.insight.application.port.out.FeatureCardRepositoryPort;
 import io.signallink.insight.application.port.out.FeatureCardUpsert;
+import io.signallink.insight.application.port.out.HealthCheckRepositoryPort;
+import io.signallink.insight.application.port.out.HealthCheckUpsert;
 import io.signallink.insight.domain.CardStatus;
+import io.signallink.insight.domain.IssueNature;
 import io.signallink.issue.application.port.out.DisclosureRef;
 import io.signallink.issue.application.port.out.IssueQueryPort;
 import io.signallink.issue.application.port.out.NewsRef;
@@ -25,6 +28,7 @@ class FeatureCardPipelineServiceTest {
     private static final LocalDate D = LocalDate.of(2026, 7, 8);
 
     private final CapturingCardRepo cardRepo = new CapturingCardRepo();
+    private final CapturingHealthRepo healthRepo = new CapturingHealthRepo();
 
     /** 두 종목이 SURGE로 선정되도록 스냅샷 구성. */
     private FeatureStockSelectService selectWith(String... stockCodes) {
@@ -69,7 +73,7 @@ class FeatureCardPipelineServiceTest {
             new InvestorFlowRow(InvestorType.FOREIGN, 100, 3000, true)));
         var pipeline = new FeatureCardPipelineService(
             selectWith("005930", "000660"), marketService(), flowService,
-            issueServiceWithDisclosure(), llmDisabled(), cardRepo);
+            issueServiceWithDisclosure(), llmDisabled(), cardRepo, healthRepo);
 
         int done = pipeline.generate(D);
 
@@ -83,6 +87,11 @@ class FeatureCardPipelineServiceTest {
         assertThat(first.flowSummary()).contains("외국인은 순매수");
         assertThat(first.sourceRefs()).hasSize(1);           // 공시 1건
         assertThat(first.marketContrib()).isEqualByComparingTo("2.000");
+
+        // 카드마다 체력 진단 이슈 성격 태그 기록 (공급계약 → 일회성)
+        assertThat(healthRepo.saved).hasSize(2);
+        assertThat(healthRepo.saved.get(0).issueNature()).isEqualTo(IssueNature.ONE_OFF);
+        assertThat(healthRepo.saved.get(0).cardId()).isEqualTo(1L);   // upsert가 돌려준 id
     }
 
     @Test
@@ -94,7 +103,7 @@ class FeatureCardPipelineServiceTest {
             prompt -> "오늘은 공급계약 공시가 나오면서 주가가 크게 올랐어요.", true, 60);
         var pipeline = new FeatureCardPipelineService(
             selectWith("005930"), marketService(), flowService,
-            issueServiceWithDisclosure(), llmEnabled, cardRepo);
+            issueServiceWithDisclosure(), llmEnabled, cardRepo, healthRepo);
 
         pipeline.generate(D);
 
@@ -114,7 +123,7 @@ class FeatureCardPipelineServiceTest {
         });
         var pipeline = new FeatureCardPipelineService(
             selectWith("005930", "000660"), marketService(), flowService,
-            issueServiceWithDisclosure(), llmDisabled(), cardRepo);
+            issueServiceWithDisclosure(), llmDisabled(), cardRepo, healthRepo);
 
         int done = pipeline.generate(D);
 
@@ -124,6 +133,11 @@ class FeatureCardPipelineServiceTest {
 
     static class CapturingCardRepo implements FeatureCardRepositoryPort {
         final List<FeatureCardUpsert> saved = new ArrayList<>();
-        @Override public void upsert(FeatureCardUpsert card) { saved.add(card); }
+        @Override public long upsert(FeatureCardUpsert card) { saved.add(card); return saved.size(); }
+    }
+
+    static class CapturingHealthRepo implements HealthCheckRepositoryPort {
+        final List<HealthCheckUpsert> saved = new ArrayList<>();
+        @Override public void upsert(HealthCheckUpsert hc) { saved.add(hc); }
     }
 }

@@ -14,17 +14,17 @@ public class FeatureCardPersistenceAdapter implements FeatureCardRepositoryPort 
     private final FeatureCardJpaRepository jpa;
 
     @Override
-    public void upsert(FeatureCardUpsert c) {
+    public long upsert(FeatureCardUpsert c) {
         String sourceRefs = SourceRefsJson.serialize(c.sourceRefs());
-        jpa.findByStockCodeAndTradeDate(c.stockCode(), c.tradeDate())
-            .ifPresentOrElse(
-                existing -> {
-                    existing.update(c.changeRate(), c.triggerType(), c.marketContrib(), c.sectorSync(),
-                        c.whatHappened(), c.flowSummary(), c.contextNote(), sourceRefs, c.llmUsed(), c.status());
-                    jpa.save(existing);
-                },
-                () -> jpa.save(new FeatureCard(c.stockCode(), c.tradeDate(), c.changeRate(), c.triggerType(),
-                    c.marketContrib(), c.sectorSync(), c.whatHappened(), c.flowSummary(), c.contextNote(),
-                    sourceRefs, c.llmUsed(), c.status())));
+        FeatureCard saved = jpa.findByStockCodeAndTradeDate(c.stockCode(), c.tradeDate())
+            .map(existing -> {
+                existing.update(c.changeRate(), c.triggerType(), c.marketContrib(), c.sectorSync(),
+                    c.whatHappened(), c.flowSummary(), c.contextNote(), sourceRefs, c.llmUsed(), c.status());
+                return jpa.save(existing);
+            })
+            .orElseGet(() -> jpa.save(new FeatureCard(c.stockCode(), c.tradeDate(), c.changeRate(),
+                c.triggerType(), c.marketContrib(), c.sectorSync(), c.whatHappened(), c.flowSummary(),
+                c.contextNote(), sourceRefs, c.llmUsed(), c.status())));
+        return saved.getId();
     }
 }
